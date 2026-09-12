@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedArquivadosRouteImport } from './routes/_authenticated/arquivados'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedSistemasRouteImport } from './routes/_authenticated/sistemas'
+import { Route as AuthenticatedSitesRouteImport } from './routes/_authenticated/sites'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps.index'
 import { Route as AuthenticatedAppsIdRouteImport } from './routes/_authenticated/apps.$id'
 
@@ -47,6 +48,11 @@ const AuthenticatedSistemasRoute = AuthenticatedSistemasRouteImport.update({
   path: '/sistemas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSitesRoute = AuthenticatedSitesRouteImport.update({
+  id: '/sites',
+  path: '/sites',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
   id: '/apps/',
   path: '/apps/',
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/arquivados': typeof AuthenticatedArquivadosRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/sistemas': typeof AuthenticatedSistemasRoute
+  '/sites': typeof AuthenticatedSitesRoute
   '/apps/$id': typeof AuthenticatedAppsIdRoute
   '/apps/': typeof AuthenticatedAppsIndexRoute
 }
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/arquivados': typeof AuthenticatedArquivadosRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/sistemas': typeof AuthenticatedSistemasRoute
+  '/sites': typeof AuthenticatedSitesRoute
   '/apps/$id': typeof AuthenticatedAppsIdRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
 }
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/_authenticated/arquivados': typeof AuthenticatedArquivadosRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/sistemas': typeof AuthenticatedSistemasRoute
+  '/_authenticated/sites': typeof AuthenticatedSitesRoute
   '/_authenticated/apps/$id': typeof AuthenticatedAppsIdRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
 }
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/arquivados'
     | '/dashboard'
     | '/sistemas'
+    | '/sites'
     | '/apps/$id'
     | '/apps/'
   fileRoutesByTo: FileRoutesByTo
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/arquivados'
     | '/dashboard'
     | '/sistemas'
+    | '/sites'
     | '/apps/$id'
     | '/apps'
   id:
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/_authenticated/arquivados'
     | '/_authenticated/dashboard'
     | '/_authenticated/sistemas'
+    | '/_authenticated/sites'
     | '/_authenticated/apps/$id'
     | '/_authenticated/apps/'
   fileRoutesById: FileRoutesById
@@ -168,6 +180,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSistemasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sites': {
+      id: '/_authenticated/sites'
+      path: '/sites'
+      fullPath: '/sites'
+      preLoaderRoute: typeof AuthenticatedSitesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/apps/': {
       id: '/_authenticated/apps/'
       path: '/apps'
@@ -189,6 +208,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedArquivadosRoute: typeof AuthenticatedArquivadosRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSistemasRoute: typeof AuthenticatedSistemasRoute
+  AuthenticatedSitesRoute: typeof AuthenticatedSitesRoute
   AuthenticatedAppsIdRoute: typeof AuthenticatedAppsIdRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
 }
@@ -197,6 +217,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedArquivadosRoute: AuthenticatedArquivadosRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSistemasRoute: AuthenticatedSistemasRoute,
+  AuthenticatedSitesRoute: AuthenticatedSitesRoute,
   AuthenticatedAppsIdRoute: AuthenticatedAppsIdRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
 }
