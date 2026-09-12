@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Archive, Boxes, Globe2, LayoutDashboard, LogOut, PanelsTopLeft } from "lucide-react";
+import { Archive, Boxes, LayoutDashboard, LogOut, PanelsTopLeft } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +10,6 @@ const NAV = [
   { to: "/dashboard", label: "Painel", icon: LayoutDashboard },
   { to: "/apps", label: "Meus apps", icon: Boxes },
   { to: "/sistemas", label: "Meus sistemas", icon: PanelsTopLeft },
-  { to: "/sites", label: "Meus sites", icon: Globe2 },
   { to: "/arquivados", label: "Arquivados", icon: Archive },
 ] as const;
 

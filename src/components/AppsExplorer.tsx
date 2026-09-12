@@ -39,7 +39,7 @@ import {
   type AppInput,
 } from "@/lib/appshelf";
 
-type Collection = "all" | "systems" | "sites";
+type Collection = "all" | "systems";
 
 type Props = {
   archived: boolean;
@@ -57,11 +57,6 @@ const COLLECTION_COPY: Record<Collection, { title: string; description: string; 
     description: "Ferramentas internas, APIs e aplicativos organizados em um só lugar.",
     empty: "Nenhum sistema cadastrado",
   },
-  sites: {
-    title: "Meus sites",
-    description: "Seus projetos Web publicados e em desenvolvimento.",
-    empty: "Nenhum site cadastrado",
-  },
 };
 
 function belongsToCollection(app: App, collection: Collection): boolean {
@@ -71,7 +66,7 @@ function belongsToCollection(app: App, collection: Collection): boolean {
     app.category === "Ferramenta interna" ||
     ["API", "Mobile", "Desktop", "Extensão"].includes(app.platform);
 
-  return collection === "systems" ? isSystem : !isSystem && app.platform === "Web";
+  return isSystem;
 }
 
 export function AppsExplorer({ archived, collection = "all" }: Props) {
