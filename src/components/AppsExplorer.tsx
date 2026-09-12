@@ -106,8 +106,13 @@ export function AppsExplorer({ archived, collection = "all" }: Props) {
   });
 
   const flagMutation = useMutation({
-    mutationFn: ({ id, patch }: { id: string; patch: { is_favorite?: boolean; is_archived?: boolean } }) =>
-      setFlags(id, patch),
+    mutationFn: ({
+      id,
+      patch,
+    }: {
+      id: string;
+      patch: { is_favorite?: boolean; is_archived?: boolean };
+    }) => setFlags(id, patch),
     onSuccess: () => invalidate(),
     onError: (err: Error) => toast.error(err.message),
   });
@@ -164,9 +169,7 @@ export function AppsExplorer({ archived, collection = "all" }: Props) {
             {archived ? "Arquivados" : copy.title}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {archived
-              ? "Projetos guardados. Restaure quando quiser retomar."
-              : copy.description}
+            {archived ? "Projetos guardados. Restaure quando quiser retomar." : copy.description}
           </p>
         </div>
         {!archived && (
@@ -310,11 +313,7 @@ export function AppsExplorer({ archived, collection = "all" }: Props) {
             )}
           </span>
           <h2 className="font-display text-lg font-semibold">
-            {hasFilters
-              ? "Nada encontrado"
-              : archived
-                ? "Nenhum app arquivado"
-                : copy.empty}
+            {hasFilters ? "Nada encontrado" : archived ? "Nenhum app arquivado" : copy.empty}
           </h2>
           <p className="max-w-sm text-sm text-muted-foreground">
             {hasFilters
