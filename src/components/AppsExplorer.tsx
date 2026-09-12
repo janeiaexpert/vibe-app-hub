@@ -39,9 +39,42 @@ import {
   type AppInput,
 } from "@/lib/appshelf";
 
-type Props = { archived: boolean };
+type Collection = "all" | "systems" | "sites";
 
-export function AppsExplorer({ archived }: Props) {
+type Props = {
+  archived: boolean;
+  collection?: Collection;
+};
+
+const COLLECTION_COPY: Record<Collection, { title: string; description: string; empty: string }> = {
+  all: {
+    title: "Meus apps",
+    description: "Tudo o que você já construiu, num só lugar.",
+    empty: "Sua estante está vazia",
+  },
+  systems: {
+    title: "Meus sistemas",
+    description: "Ferramentas internas, APIs e aplicativos organizados em um só lugar.",
+    empty: "Nenhum sistema cadastrado",
+  },
+  sites: {
+    title: "Meus sites",
+    description: "Seus projetos Web publicados e em desenvolvimento.",
+    empty: "Nenhum site cadastrado",
+  },
+};
+
+function belongsToCollection(app: App, collection: Collection): boolean {
+  if (collection === "all") return true;
+
+  const isSystem =
+    app.category === "Ferramenta interna" ||
+    ["API", "Mobile", "Desktop", "Extensão"].includes(app.platform);
+
+  return collection === "systems" ? isSystem : !isSystem && app.platform === "Web";
+}
+
+export function AppsExplorer({ archived, collection = "all" }: Props) {
   const queryClient = useQueryClient();
   const { data, isLoading, isError, error, refetch } = useQuery(appsQuery(archived));
 
@@ -92,6 +125,7 @@ export function AppsExplorer({ archived }: Props) {
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     const list = (data ?? []).filter((app) => {
+      if (!archived && !belongsToCollection(app, collection)) return false;
       if (onlyFavorites && !app.is_favorite) return false;
       if (status !== "todos" && app.status !== status) return false;
       if (category !== "todas" && app.category !== category) return false;
@@ -115,7 +149,9 @@ export function AppsExplorer({ archived }: Props) {
           return b.created_at.localeCompare(a.created_at);
       }
     });
-  }, [data, search, status, category, onlyFavorites, sort]);
+  }, [data, search, status, category, onlyFavorites, sort, archived, collection]);
+
+  const copy = COLLECTION_COPY[collection];
 
   const hasFilters =
     search.trim() !== "" || status !== "todos" || category !== "todas" || onlyFavorites;
@@ -125,12 +161,12 @@ export function AppsExplorer({ archived }: Props) {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl font-semibold tracking-tight">
-            {archived ? "Arquivados" : "Meus apps"}
+            {archived ? "Arquivados" : copy.title}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {archived
               ? "Projetos guardados. Restaure quando quiser retomar."
-              : "Tudo o que você já construiu, num só lugar."}
+              : copy.description}
           </p>
         </div>
         {!archived && (
@@ -278,14 +314,16 @@ export function AppsExplorer({ archived }: Props) {
               ? "Nada encontrado"
               : archived
                 ? "Nenhum app arquivado"
-                : "Sua estante está vazia"}
+                : copy.empty}
           </h2>
           <p className="max-w-sm text-sm text-muted-foreground">
             {hasFilters
               ? "Tente mudar a pesquisa ou os filtros."
               : archived
                 ? "Apps que você arquivar aparecem aqui."
-                : "Cadastre seu primeiro aplicativo para começar a organizar."}
+                : collection === "all"
+                  ? "Cadastre seu primeiro aplicativo para começar a organizar."
+                  : `Os novos cadastros são organizados automaticamente em ${copy.title.toLowerCase()}.`}
           </p>
           {hasFilters ? (
             <Button
