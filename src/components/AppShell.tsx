@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Archive, LayoutDashboard, LogOut, Boxes } from "lucide-react";
+import { Archive, Boxes, Globe2, LayoutDashboard, LogOut, PanelsTopLeft } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 const NAV = [
   { to: "/dashboard", label: "Painel", icon: LayoutDashboard },
   { to: "/apps", label: "Meus apps", icon: Boxes },
+  { to: "/sistemas", label: "Meus sistemas", icon: PanelsTopLeft },
+  { to: "/sites", label: "Meus sites", icon: Globe2 },
   { to: "/arquivados", label: "Arquivados", icon: Archive },
 ] as const;
 
@@ -72,13 +74,13 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         <nav
           aria-label="Navegação principal (móvel)"
-          className="flex gap-1 border-t border-border px-3 py-2 sm:hidden"
+          className="flex gap-1 overflow-x-auto border-t border-border px-3 py-2 sm:hidden"
         >
           {NAV.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
               to={to}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg px-2 py-2 text-xs font-medium text-muted-foreground"
+              className="inline-flex min-w-max flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-muted-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               <Icon className="size-4" aria-hidden="true" />
