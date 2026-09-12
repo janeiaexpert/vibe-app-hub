@@ -1,14 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Boxes, Loader2 } from "lucide-react";
-import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -24,6 +20,8 @@ export const Route = createFileRoute("/auth")({
         property: "og:description",
         content: "Acesse sua estante pessoal de aplicativos Vibe Coding.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AuthPage,
@@ -31,9 +29,6 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState("entrar");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(true);
@@ -45,57 +40,24 @@ function AuthPage() {
     });
   }, [navigate]);
 
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
+  async function handleGoogle() {
     setError("");
-    if (!email.trim() || !password) {
-      setError("Preencha e-mail e senha.");
-      return;
-    }
-    if (mode === "criar" && password.length < 6) {
-      setError("A senha precisa ter pelo menos 6 caracteres.");
-      return;
-    }
     setLoading(true);
     try {
-      if (mode === "entrar") {
-        const { error: err } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
-        if (err) throw err;
-        navigate({ to: "/dashboard", replace: true });
-      } else {
-        const { data, error: err } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (err) throw err;
-        if (data.session) {
-          navigate({ to: "/dashboard", replace: true });
-        } else {
-          toast.success("Conta criada! Confirme o e-mail que enviamos para entrar.");
-        }
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        setError("Não foi possível entrar com o Google.");
+        return;
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Não foi possível continuar.");
+      if (result.redirected) return;
+      navigate({ to: "/dashboard", replace: true });
+    } catch {
+      setError("Não foi possível entrar com o Google.");
     } finally {
       setLoading(false);
     }
-  }
-
-  async function handleGoogle() {
-    setError("");
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      setError("Não foi possível entrar com o Google.");
-      return;
-    }
-    if (result.redirected) return;
-    navigate({ to: "/dashboard", replace: true });
   }
 
   if (checking) {
@@ -136,61 +98,17 @@ function AuthPage() {
 
           <h1 className="font-display text-2xl font-semibold">Bem-vindo</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Entre para acessar seus aplicativos.
+            Entre com sua conta Google para acessar seus aplicativos.
           </p>
 
-          <Tabs value={mode} onValueChange={setMode} className="mt-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="entrar">Entrar</TabsTrigger>
-              <TabsTrigger value="criar">Criar conta</TabsTrigger>
-            </TabsList>
+          {error && (
+            <p role="alert" className="mt-6 text-sm text-destructive">
+              {error}
+            </p>
+          )}
 
-            <TabsContent value={mode} className="mt-6">
-              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-                <div className="space-y-2">
-                  <Label htmlFor="email">E-mail</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="voce@exemplo.com"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    autoComplete={mode === "entrar" ? "current-password" : "new-password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                  />
-                </div>
-
-                {error && (
-                  <p role="alert" className="text-sm text-destructive">
-                    {error}
-                  </p>
-                )}
-
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
-                  {mode === "entrar" ? "Entrar" : "Criar conta"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-
-          <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="h-px flex-1 bg-border" />
-            ou
-            <span className="h-px flex-1 bg-border" />
-          </div>
-
-          <Button variant="outline" className="w-full" onClick={handleGoogle}>
+          <Button className="mt-6 w-full" onClick={handleGoogle} disabled={loading}>
+            {loading && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
             Continuar com Google
           </Button>
         </div>
